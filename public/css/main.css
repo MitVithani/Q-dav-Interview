@@ -185,7 +185,7 @@ textarea.input + .shadow-input {
 }
 
 /*---------------------------------------------*/
-.wrap-input {
+.wrap-input1 {
   position: relative;
   width: 100%;
   z-index: 1;

@@ -9,24 +9,24 @@ class ContactUSController extends Controller
 {
     public function contactUsSubmit(Request $request)
     {
-        // laravel validation
-        $this->validate($request,[
-            'name' => 'required|min:5|max:35',
-            'email' => 'required|email|unique:contact_us',
-            'phone_number' => 'required|numeric|digits:10',
-            'category' => 'required',
-        ]);
+        // laravel form validation
+        // $this->validate($request,[
+        //     'name' => 'required|min:5|max:35',
+        //     'email' => 'required|email|unique:contact_us',
+        //     'phone_number' => 'required|numeric|digits:10',
+        //     'category' => 'required',
+        // ]);
 
-        // inster detail
-        $ins = [
-            'name' => $request['name'],
-            'email' => $request['email'],
-            'phone_number' => $request['phone_number'],
-            'category' => $request['category'],
-        ];
-        $addContacDtl = Contact_Us::create($ins);
+        // // inster detail
+        // $ins = [
+        //     'name' => $request['name'],
+        //     'email' => $request['email'],
+        //     'phone_number' => $request['phone_number'],
+        //     'category' => $request['category'],
+        // ];
+        // $addContacDtl = Contact_Us::create($ins);
         
-        return back()->with('success', 'Thank you for getting in touch........');
+        echo 'Thank you for getting in touch........';
     }
 
     public function deleteContactDtl($id)

@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{env('APP_NAME')}}</title>
 
@@ -11,6 +12,7 @@
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
         
+        <link rel="stylesheet" type="text/css" href="{{env('PUBLIC_PATH')}}fonts/font-awesome-4.7.0/css/font-awesome.min.css">
         <!-- css -->
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -35,40 +37,41 @@
                         <img src="{{env('PUBLIC_PATH')}}images/img-01.png" alt="IMG">
                     </div>
         
-                    <form method="POST" action="{{env('APP_URL')}}/contact_us_submit" >
+                    {{-- <form method="POST" action="{{env('APP_URL')}}/contact_us_submit" > --}}
+                    <form id="contact_form_id" class="contact_form" >
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <span class="contect-us-contact-form-title">
                             Contact Us
                         </span>
         
-                        <div class="wrap-input validate-input {{ $errors->has('name') ? 'has-error' : '' }}">
-                            <input class="input" type="text" name="name" placeholder="Name" value="{{ old('name') }}">
-                            <span class="text-danger">{{ $errors->first('name') }}</span>
+                        <div class="wrap-input1 validate-input" data-validate = "Name is required">
+                            <input class="input" type="text" name="name" placeholder="Name">
+                            <span class="shadow-input1"></span>
                         </div>
         
-                        <div class="wrap-input validate-input {{ $errors->has('email') ? 'has-error' : '' }}">
-                            <input class="input" type="text" name="email" placeholder="Email"  value="{{ old('email') }}">
-                            <span class="text-danger">{{ $errors->first('email') }}</span>
+                        <div class="wrap-input1 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+                            <input class="input" type="text" name="email"  placeholder="Email" >
+                            <span class="shadow-input1"></span>
                         </div>
         
-                        <div class="wrap-input validate-input {{ $errors->has('phone_number') ? 'has-error' : '' }}">
-                            <input class="input phone" type="text" name="phone_number" placeholder="Phone number"  value="{{ old('phone_number') }}">
-                            <span class="text-danger">{{ $errors->first('phone_number') }}</span>
+                        <div class="wrap-input1 validate-input" data-validate = "Phone number is invalid">
+                            <input class="input phone" type="text" name="phone_number" placeholder="Phone number" >
+                            <span class="shadow-input1"></span>
                         </div>
         
-                        <div class="wrap-input validate-input {{ $errors->has('category') ? 'has-error' : '' }}">
-                            <input class="input" list="category" name="category" placeholder="Category"  value="{{ old('category') }}">
+                        <div class="wrap-input1 validate-input">
+                            <input class="input" list="category" name="category" placeholder="Category" value="Student">
                             <datalist id="category">
                                 <option value="Student">Student</option>
                                 <option value="Work">Work</option>
                                 <option value="Others ">Others </option>
                             </datalist>
-                            <span class="text-danger">{{ $errors->first('category') }}</span>
+                            <span class="shadow-input1"></span>
                         </div>
         
                         <div class="container-contect-us-contact-form-btn">
-                            <button type="submit" class="contect-us-contact-form-btn">
+                            <button type="button" class="contect-us-contact-form-btn" id="submit-btn">
                                 <span>
                                     Submit
                                     <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
@@ -76,7 +79,7 @@
                             </button>
                            
                         </div>
-                        <div class="container-contect-us-msg">
+                        {{-- <div class="container-contect-us-msg">
                             @if (\Session::has('success'))
                                 <div class="alert alert-success">
                                     <ul>
@@ -84,12 +87,13 @@
                                     </ul>
                                 </div>
                             @endif
-                        </div>
+                        </div> --}}
                     </form>
                 </div>
             </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        {{-- <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script> --}}
 
         <script>
             
@@ -116,6 +120,85 @@
                 return (false);
             }
 
+            (function ($) {
+                "use strict";
+
+                /*==================================================================
+                [ Validate ]*/
+                var name = $('.validate-input input[name="name"]');
+                var email = $('.validate-input input[name="email"]');
+                var phone_number = $('.validate-input input[name="phone_number"]');
+                var category = $('.validate-input textarea[name="category"]');
+
+                $('#submit-btn').on('click',function(){
+                    // alert('hy');
+                    var check = true;
+
+                    if($(name).val() == ''){
+                        showValidate(name);
+                        check=false;
+                    }
+
+                    if($(phone_number).val().match(/^[6-9][0-9]{9}$/) == null) {
+                        showValidate(phone_number);
+                        check=false;
+                    }
+
+                    if($(email).val().match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/) == null) {
+                        showValidate(email);
+                        check=false;
+                    }
+
+                    if($(category).val() == ''){
+                        showValidate(category);
+                        check=false;
+                    }
+
+                    if(check == true)
+                    {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            }
+                        });
+                        var url = "{{env('APP_URL')}}/contact_us_submit";
+                        var contactFormData = $('#contact_form_id').serialize();
+
+                        $.ajax({
+                            url: url,
+                            data: contactFormData,
+                            cache: false,
+                            processData: false,
+                            contentType: false,
+                            type: 'POST',
+                            success: function (dataofconfirm) {
+                                $('input[type="text"]').each(function() {
+                                    $(this).val('');
+                                });
+                                alert(dataofconfirm);
+                            }
+                        })
+
+                    }
+                    return check;
+                });
+
+                $('.contact_form .input').each(function(){
+                    $(this).focus(function(){
+                        hideValidate(this);
+                    });
+                });
+
+                function showValidate(input) {
+                    var thisAlert = $(input).parent();
+                    $(thisAlert).addClass('alert-validate');
+                }
+
+                function hideValidate(input) {
+                    var thisAlert = $(input).parent();
+                    $(thisAlert).removeClass('alert-validate');
+                }
+            })(jQuery);
         </script>
 
     </body>
