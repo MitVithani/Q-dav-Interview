@@ -24,7 +24,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-
         $contactDtls = Contact_Us::get();
         return view('admin.contact_us.index')->with('contactDtls', $contactDtls);
     }
